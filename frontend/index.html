@@ -116,13 +116,6 @@
             <md-card layout="row" layout-align="space-between center" style="height: 210px;">
                 <div ng-if="showEndScreen" layout="column" style="position: absolute; height: 210px; width: 100%; z-index: 2; background: #414141; color: white; left: 0;">
                     <p>GAME OVER</p>
-                    <md-button class="md-raised" ng-disabled="emailLoading || emailSentSuccessfully" ng-click="sendMail()">Highscores
-                        an Osman schicken</md-button>
-                    <div ng-if="emailLoading">
-                        <p>E-Mail wird gesendet...</p>
-                        <md-progress-linear md-mode="indeterminate"></md-progress-linear>
-                    </div>
-                    <p ng-if="emailSentSuccessfully">E-Mail erfolgreich gesendet!</p>
                 </div>
                 <div style="height: 180px; width: 100px; max-width: 100px; background-color: {{currentColorCode}}; margin-right: auto; background-size: contain; background-repeat: no-repeat; background-position: center; box-shadow: 0 1px 3px 0 rgba(0,0,0,.2), 0 1px 1px 0 rgba(0,0,0,.14), 0 2px 1px -1px rgba(0,0,0,.12);"></div>
                 <div layout="column">
@@ -308,33 +301,6 @@
                     return v.toString(16);
                 });
             }
-
-            $scope.sendMail = function () {
-                $scope.emailLoading = true;
-                var data = {
-                    receiver: 'test@test.com',
-                    highscores: []
-                };
-                for (var i = 0; i < $scope.highscores.length; i++) {
-                    data.highscores.push({
-                        name: $scope.highscores[i].name,
-                        score: $scope.highscores[i].score
-                    });
-                }
-                var req = {
-                    method: 'POST',
-                    url: 'https://jrrbz5jgfa.execute-api.eu-west-1.amazonaws.com/default/ServerlessQuizMailService',
-                    headers: {
-                        'content-type': "application/json"
-                    },
-                    data: data
-                }
-                return $http(req)
-                    .then(function (response) {
-                        $scope.emailLoading = false;
-                        $scope.emailSentSuccessfully = true;
-                    });
-            };
 
             init();
 
