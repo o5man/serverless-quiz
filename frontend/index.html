@@ -208,7 +208,7 @@
                 <!--</div>-->
                 <div style="height: 180px; width: 150px; background-image: url(https://s3-eu-west-1.amazonaws.com/{{currentQuestionImageUrl}}); margin: auto; background-size: cover; background-repeat: no-repeat; background-position: center; box-shadow: 0 1px 3px 0 rgba(0,0,0,.2), 0 1px 1px 0 rgba(0,0,0,.14), 0 2px 1px -1px rgba(0,0,0,.12);"></div>
                 <div layout="column">
-                    <md-button class="md-raised" ng-disabled="questionLoading" ng-click="continueToNextImageQuestion(currentQuestionImageUrl, item)"
+                    <md-button class="md-raised" ng-disabled="questionLoading" ng-click="continueToNextQuestion(currentQuestionImageUrl, item)"
                                ng-repeat="item in currentQuestionImageLabels" style="white-space: normal; max-width: 125px; line-height: 1; font-size: 12px;">{{item}}</md-button>
                 </div>
             </md-card>
@@ -232,7 +232,7 @@
 
             init = function () {
                 $scope.showStartScreen = true;
-                $scope.continueToNextImageQuestion();
+                $scope.continueToNextQuestion();
                 $scope.playerId = create_UUID();
                 setTimeout(function () {
                     var input = document.querySelector('#imageToBeUploaded');
@@ -245,41 +245,7 @@
                 $scope.playerColor = color;
             }
 
-            $scope.continueToNextColorQuestion = function (question, answer) {
-                var data = {};
-                if (question && answer) {
-                    data = {
-                        'colorCode': question,
-                        'colorName': answer,
-                        'playerId': $scope.playerId,
-                        'playerName': $scope.playerName,
-                        'playerColor': $scope.playerColor
-                    }
-                }
-                $scope.questionLoading = true;
-                var req = {
-                    method: 'POST',
-                    url: 'https://wqptx2er60.execute-api.eu-west-1.amazonaws.com/default/QuestionRequestHandler',
-                    headers: {
-                        'content-type': "application/json"
-                    },
-                    data: data
-                }
-                return $http(req)
-                    .then(function (response) {
-                        $scope.currentColorCode = response.data.nextQuestion.colorCode;
-                        $scope.currentColorNames = response.data.nextQuestion.colorNames;
-                        $scope.lastAnswerCorrect = response.data.lastAnswerCorrect;
-                        $scope.highlightedBackgroundColor = response.data.lastAnswerCorrect ? '#92f297' : '#f29292';
-                        $scope.questionLoading = false;
-                        setTimeout(function () {
-                            $scope.highlightedBackgroundColor = '#FFFFFF';
-                            $scope.$apply();
-                        }, 500)
-                    });
-            }
-
-            $scope.continueToNextImageQuestion = function (question, answer) {
+            $scope.continueToNextQuestion = function (question, answer) {
                 var data = {};
                 if (question && answer) {
                     data = {
@@ -293,7 +259,7 @@
                 $scope.questionLoading = true;
                 var req = {
                     method: 'POST',
-                    url: 'https://19tt3fal06.execute-api.eu-west-1.amazonaws.com/default/QuizImageQuestion',
+                    url: 'https://hfhrftde42.execute-api.eu-west-1.amazonaws.com/default/ServerlessQuizPersistentImageQuestionService',
                     headers: {
                         'content-type': "application/json"
                     },
@@ -342,7 +308,7 @@
             function getHighscores() {
                 var req = {
                     method: 'GET',
-                    url: 'https://gaj4caicuc.execute-api.eu-west-1.amazonaws.com/default/QuizScoreService'
+                    url: 'https://4uvwi5uzs7.execute-api.eu-west-1.amazonaws.com/default/ServerlessQuizScoreService'
                 }
                 return $http(req)
                     .then(function (response) {
@@ -446,7 +412,7 @@
                 }
                 var req = {
                     method: 'POST',
-                    url: 'https://ucewrblsaf.execute-api.eu-west-1.amazonaws.com/default/QuizMailService',
+                    url: 'https://jrrbz5jgfa.execute-api.eu-west-1.amazonaws.com/default/ServerlessQuizMailService',
                     headers: {
                         'content-type': "application/json"
                     },
@@ -468,7 +434,7 @@
                     .then(function (base64Image) {
                         var req = {
                             method: 'POST',
-                            url: 'https://8gqx7s0mz0.execute-api.eu-west-1.amazonaws.com/default/QuizImageUpload',
+                            url: 'https://k52q3njfx2.execute-api.eu-west-1.amazonaws.com/default/ServerlessQuizImageUploadService',
                             headers: {
                                 'content-type': "application/json"
                             },
@@ -516,7 +482,7 @@
                 $scope.rotationClass = 'rotating';
                 var req = {
                     method: 'GET',
-                    url: 'https://8gqx7s0mz0.execute-api.eu-west-1.amazonaws.com/default/QuizImageUpload'
+                    url: 'https://mog4biwprb.execute-api.eu-west-1.amazonaws.com/default/ServerlessQuizImageListService'
                 }
                 return $http(req)
                     .then(function (response) {
