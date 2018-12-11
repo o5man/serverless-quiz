@@ -73,46 +73,7 @@
             margin-left: 0 !important;
             margin-right: 0 !important;
         }
-
-        md-tabs.layout-fill {
-            height: 85vh;
-        }
-
-        @-webkit-keyframes rotating /* Safari and Chrome */ {
-            from {
-                -webkit-transform: rotate(0deg);
-                -o-transform: rotate(0deg);
-                transform: rotate(0deg);
-            }
-            to {
-                -webkit-transform: rotate(360deg);
-                -o-transform: rotate(360deg);
-                transform: rotate(360deg);
-            }
-            }
-            @keyframes rotating {
-            from {
-                -ms-transform: rotate(0deg);
-                -moz-transform: rotate(0deg);
-                -webkit-transform: rotate(0deg);
-                -o-transform: rotate(0deg);
-                transform: rotate(0deg);
-            }
-            to {
-                -ms-transform: rotate(360deg);
-                -moz-transform: rotate(360deg);
-                -webkit-transform: rotate(360deg);
-                -o-transform: rotate(360deg);
-                transform: rotate(360deg);
-            }
-            }
-            .rotating {
-            -webkit-animation: rotating 2s linear infinite;
-            -moz-animation: rotating 2s linear infinite;
-            -ms-animation: rotating 2s linear infinite;
-            -o-animation: rotating 2s linear infinite;
-            animation: rotating 2s linear infinite;
-            }
+        
     </style>
 </head>
 
@@ -121,59 +82,20 @@
     <div id="start-screen" ng-show="showStartScreen" class="background">
         <md-content layout-align="start center" class="background-child">
             <md-card layout-align="center center">
-                <md-tabs md-border-bottom md-stretch-tabs="always" layout-fill>
-                    <md-tab label="Start">
-                        <h2>Willkommen zum <br /> Serverless Spiel!</h2>
-                        <md-input-container layout="row" style="margin-bottom: 6px; margin-top: 12px; width: 95%">
-                            <label style="text-align: start;">Wie heißt Du?</label>
-                            <md-icon md-svg-icon="social:ic_person_outline_24px"></md-icon>
-                            <input ng-model="playerName" type="text" style="min-width: 100%">
-                        </md-input-container>
-                        <div style="margin-bottom: 18px;">
-                            <p>Wähle eine Farbe</p>
-                            <div layout="row" style="flex-wrap: wrap; justify-content: center;">
-                                <div ng-repeat="item in materialColorsDark" ng-click="selectColor(item)" ng-style="{'background-color': item, 'border-width': (playerColor === item) ? '3px' : '0', 'margin': (playerColor === item) ? '0' : '3px'}"
-                                     style="height: 40px; width: 40px; border: solid; margin: 3px;"></div>
-                            </div>
-                        </div>
-                        <md-button class="md-raised" ng-click="showMainPage()" ng-disabled="!playerName || !playerColor">START</md-button>
-                    </md-tab>
-                    <md-tab label="Bilder ({{uploadedImages.length}})">
-                        <div style="display: flex; align-items: center; justify-content: space-around; margin-top: 12px;">
-                            <div style="justify-content: center; display: flex; position: relative;">
-                                <label for="imageToBeUploaded" class="md-whiteframe-z2" ng-hide="imageUploading || imageClassifying"
-                                       ng-style="{'cursor': resourceImageLoading ? 'default' : 'pointer'}" style=" height: 36px; position: absolute; padding: 5px; margin: 6px; cursor: pointer; border-radius: 2px; width: 140px;"></label>
-                                <div style="font-size: 14px; text-transform: uppercase; width: 90%; height: 36px; padding: 5px; margin: 6px;">
-                                    <div style="display: flex; flex-direction: column; align-items: center; height: 100%"
-                                         ng-if="imageUploading">
-                                        <md-progress-linear md-mode="indeterminate" style="padding-bottom: 6px;"></md-progress-linear>
-                                        <div>Upload läuft...</div>
-                                    </div>
-                                    <div style="display: flex; flex-direction: column; align-items: center; height: 100%"
-                                         ng-if="imageClassifying">
-                                         <md-progress-linear md-mode="indeterminate" style="padding-bottom: 6px;"></md-progress-linear>
-                                        <div>Klassifizierung läuft...</div>
-                                    </div>
-                                    <div style="display: flex; flex-direction: row; align-items: center; justify-content: center; height: 100%"
-                                         ng-if="!imageUploading && !imageClassifying">
-                                        <md-icon md-svg-icon="image:ic_collections_24px" style="margin: 12px;"></md-icon>
-                                        <span>Hochladen</span>
-                                    </div>
-                                </div>
-                            </div>
-                            <md-button class="md-icon-button md-raised" ng-click="getImages()" ng-style="{'background-color': highlightedBackgroundColor}">
-                                <md-icon class="{{rotationClass}} animated-background" md-svg-icon="action:ic_autorenew_24px" aria-label="Send message"></md-icon>
-                            </md-button>
-                        </div>
-                        <input type="file" name="imageToBeUploaded" id="imageToBeUploaded" accept="image/jpeg"
-                               style="width: 0.1px; height: 0.1px; opacity: 0; overflow: hidden; position: absolute; z-index: -1;" />
-                        <h3>Hochgeladene Bilder</h3>
-                        <div ng-repeat="item in uploadedImages | orderBy:'-url'">
-                            <div style="height: 180px; width: 120px; background-image: url(https://s3-eu-west-1.amazonaws.com/{{item.url}}); margin: auto; background-size: cover; background-repeat: no-repeat; background-position: center; box-shadow: 0 1px 3px 0 rgba(0,0,0,.2), 0 1px 1px 0 rgba(0,0,0,.14), 0 2px 1px -1px rgba(0,0,0,.12);"></div>
-                            <p>{{item.label}}</p>
-                        </div>
-                    </md-tab>
-                </md-tabs>
+                <h2>Willkommen zum <br /> Serverless Spiel!</h2>
+                <md-input-container layout="row" style="margin-bottom: 6px; margin-top: 12px; width: 95%">
+                    <label style="text-align: start;">Wie heißt Du?</label>
+                    <md-icon md-svg-icon="social:ic_person_outline_24px"></md-icon>
+                    <input ng-model="playerName" type="text" style="min-width: 100%">
+                </md-input-container>
+                <div style="margin-bottom: 18px;">
+                    <p>Wähle eine Farbe</p>
+                    <div layout="row" style="flex-wrap: wrap; justify-content: center;">
+                        <div ng-repeat="item in materialColorsDark" ng-click="selectColor(item)" ng-style="{'background-color': item, 'border-width': (playerColor === item) ? '3px' : '0', 'margin': (playerColor === item) ? '0' : '3px'}"
+                                style="height: 40px; width: 40px; border: solid; margin: 3px;"></div>
+                    </div>
+                </div>
+                <md-button class="md-raised" ng-click="showMainPage()" ng-disabled="!playerName || !playerColor">START</md-button>
             </md-card>
         </md-content>
     </div>
@@ -202,14 +124,9 @@
                     </div>
                     <p ng-if="emailSentSuccessfully">E-Mail erfolgreich gesendet!</p>
                 </div>
-                <!--<div style="height: 180px; width: 150px; background-color: currentColorCode; margin: auto; background-size: contain; background-repeat: no-repeat; background-position: center; box-shadow: 0 1px 3px 0 rgba(0,0,0,.2), 0 1px 1px 0 rgba(0,0,0,.14), 0 2px 1px -1px rgba(0,0,0,.12);"></div>-->
-                <!--<div layout="column">-->
-                <!--<md-button class="md-raised" ng-disabled="questionLoading" ng-click="continueToNextQuestion(currentColorCode, item)" ng-repeat="item in currentColorNames">{{item}}</md-button>-->
-                <!--</div>-->
-                <div style="height: 180px; width: 150px; background-image: url(https://s3-eu-west-1.amazonaws.com/{{currentQuestionImageUrl}}); margin: auto; background-size: cover; background-repeat: no-repeat; background-position: center; box-shadow: 0 1px 3px 0 rgba(0,0,0,.2), 0 1px 1px 0 rgba(0,0,0,.14), 0 2px 1px -1px rgba(0,0,0,.12);"></div>
+                <div style="height: 180px; width: 100px; max-width: 100px; background-color: {{currentColorCode}}; margin-right: auto; background-size: contain; background-repeat: no-repeat; background-position: center; box-shadow: 0 1px 3px 0 rgba(0,0,0,.2), 0 1px 1px 0 rgba(0,0,0,.14), 0 2px 1px -1px rgba(0,0,0,.12);"></div>
                 <div layout="column">
-                    <md-button class="md-raised" ng-disabled="questionLoading" ng-click="continueToNextQuestion(currentQuestionImageUrl, item)"
-                               ng-repeat="item in currentQuestionImageLabels" style="white-space: normal; max-width: 125px; line-height: 1; font-size: 12px;">{{item}}</md-button>
+                    <md-button class="md-raised" ng-disabled="questionLoading" ng-click="continueToNextQuestion(currentColorCode, item)" ng-repeat="item in currentColorNames">{{item}}</md-button>
                 </div>
             </md-card>
             <md-card>
@@ -234,11 +151,6 @@
                 $scope.showStartScreen = true;
                 $scope.continueToNextQuestion();
                 $scope.playerId = create_UUID();
-                setTimeout(function () {
-                    var input = document.querySelector('#imageToBeUploaded');
-                    input.addEventListener('change', uploadImage);
-                }, 350)
-                $scope.getImages();
             }
 
             $scope.selectColor = function (color) {
@@ -259,7 +171,7 @@
                 $scope.questionLoading = true;
                 var req = {
                     method: 'POST',
-                    url: 'https://hfhrftde42.execute-api.eu-west-1.amazonaws.com/default/ServerlessQuizPersistentImageQuestionService',
+                    url: 'https://dz9jdkgh3i.execute-api.eu-west-1.amazonaws.com/default/ServerlessQuizPersistentQuestionService',
                     headers: {
                         'content-type': "application/json"
                     },
@@ -267,8 +179,8 @@
                 }
                 return $http(req)
                     .then(function (response) {
-                        $scope.currentQuestionImageUrl = response.data.nextQuestion.imageUrl;
-                        $scope.currentQuestionImageLabels = response.data.nextQuestion.labels;
+                        $scope.currentColorCode = response.data.nextQuestion.colorCode;
+                        $scope.currentColorNames = response.data.nextQuestion.colorNames;
                         $scope.lastAnswerCorrect = response.data.lastAnswerCorrect;
                         $scope.highlightedBackgroundColor = response.data.lastAnswerCorrect ? '#92f297' : '#f29292';
                         $scope.questionLoading = false;
@@ -283,7 +195,6 @@
                 $scope.showStartScreen = false;
                 getHighscores();
                 startGameTimer();
-                $scope.stopGettingImages = true;
             }
 
             function startGameTimer() {
@@ -424,77 +335,6 @@
                         $scope.emailSentSuccessfully = true;
                     });
             };
-
-            function uploadImage() {
-                $scope.imageUploading = true;
-                var input = document.querySelector('#imageToBeUploaded');
-                var file = input.files[0];
-                if (!file) return;
-                getBase64(file)
-                    .then(function (base64Image) {
-                        var req = {
-                            method: 'POST',
-                            url: 'https://k52q3njfx2.execute-api.eu-west-1.amazonaws.com/default/ServerlessQuizImageUploadService',
-                            headers: {
-                                'content-type': "application/json"
-                            },
-                            data: {
-                                'base64Image': base64Image
-                            }
-                        }
-                        return $http(req)
-                            .then(function (response) {
-                                $scope.imageUploading = false;
-                                $scope.imageClassifying = true;
-                                setTimeout(function () {
-                                    $scope.getImages();
-                                    $scope.imageClassifying = false;
-                                    $mdToast.show(
-                                        $mdToast.simple()
-                                            .textContent('Erfolgreich hochgeladen!')
-                                            .position("top right")
-                                            .hideDelay(2000)
-                                    );
-                                }, 2000)
-                            }, function (error) {
-                                $scope.imageUploading = false;
-                                $scope.imageClassifying = false;
-                                $mdToast.show(
-                                    $mdToast.simple()
-                                        .textContent('Fehler aufgetreten :(')
-                                        .position("top right")
-                                        .hideDelay(2000)
-                                );
-                            })
-                    })
-            };
-
-            function getBase64(file) {
-                return new Promise((resolve, reject) => {
-                    const reader = new FileReader();
-                    reader.readAsDataURL(file);
-                    reader.onload = () => resolve(reader.result);
-                    reader.onerror = error => reject(error);
-                });
-            }
-
-            $scope.getImages = function () {
-                $scope.rotationClass = 'rotating';
-                var req = {
-                    method: 'GET',
-                    url: 'https://mog4biwprb.execute-api.eu-west-1.amazonaws.com/default/ServerlessQuizImageListService'
-                }
-                return $http(req)
-                    .then(function (response) {
-                        $scope.uploadedImages = response.data;
-                        $scope.rotationClass = '';
-                        $scope.highlightedBackgroundColor = '#92f297';
-                        setTimeout(function () {
-                            $scope.highlightedBackgroundColor = '#fafafa';
-                            $scope.$apply();
-                        }, 500)
-                    });
-            }
 
             init();
 
