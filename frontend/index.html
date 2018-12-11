@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <title>Serverless Workshop</title>
+    <link rel="stylesheet" href="https://ajax.googleapis.com/ajax/libs/angular_material/1.1.7/angular-material.min.css" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
+    <style>
+        @import url('https://fonts.googleapis.com/css?family=Fredoka+One');
+
+        [ng\:cloak],
+        [ng-cloak],
+        [data-ng-cloak],
+        [x-ng-cloak],
+        .ng-cloak,
+        .x-ng-cloak {
+            display: none !important;
+        }
+
+        .background {
+            height: 100vh;
+            width: 100vw;
+            position: fixed;
+            top: 0;
+            left: 0;
+            background: #bababa;
+            overflow: auto;
+        }
+
+        md-content {
+            background-color: transparent !important;
+            margin-left: auto !important;
+            margin-right: auto !important;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100%;
+            justify-content: flex-start;
+            font-family: 'Fredoka One';
+        }
+
+        h1,
+        h2,
+        h3,
+        h4,
+        h5,
+        p,
+        span,
+        button {
+            font-weight: normal !important;
+        }
+
+        md-card {
+            padding: 8px;
+            text-align: center;
+            width: 90vw;
+            margin: 3px;
+        }
+
+        .animated-background {
+            transition: background-color 0.5s ease;
+        }
+
+        md-select-menu md-content {
+            margin-left: 0 !important;
+            margin-right: 0 !important;
+        }
+    </style>
+</head>
+
+<body ng-app="StarterApp">
+    <div ng-controller="appController" ng-cloak>
+        <div id="start-screen" ng-show="showStartScreen" class="background">
+            <md-content layout-align="center center">
+                <md-card layout-align="center center">
+                    <h1>Willkommen zum Serverless Spiel!</h1>
+                    <md-input-container layout="row" style="margin-bottom: 6px; margin-top: 12px; width: 100%">
+                        <label style="text-align: start;">Wie heißt Du?</label>
+                        <md-icon md-svg-icon="social:ic_person_outline_24px"></md-icon>
+                        <input ng-model="playerName" type="text" style="min-width: 100%">
+                    </md-input-container>
+                    <div style="margin-bottom: 18px;">
+                        <p>Wähle eine Farbe</p>
+                        <div layout="row" style="flex-wrap: wrap; justify-content: center;">
+                            <div ng-repeat="item in materialColorsDark" ng-click="selectColor(item)" ng-style="{'background-color': item, 'border-width': (playerColor === item) ? '3px' : '0', 'margin': (playerColor === item) ? '0' : '3px'}"
+                                style="height: 40px; width: 40px; border: solid; margin: 3px;"></div>
+                        </div>
+                    </div>
+                    <md-button class="md-raised" ng-click="showMainPage()" ng-disabled="!playerName || !playerColor">START</md-button>
+                </md-card>
+            </md-content>
+        </div>
+        <div id="main-screen" ng-show="!showStartScreen" class="background">
+            <md-content layout-align="center center">
+                <md-card style="height: 70px;" layout="row">
+                    <div flex="50" style="font-size: 20px;">
+                        <p>{{gameTimeLeft}}</p>
+                    </div>
+                    <div flex="50" ng-if="lastAnswerCorrect != null" class="animated-background" ng-style="{'background-color': highlightedBackgroundColor}">
+                        <p style="margin-top: 6px; margin-bottom: 0; font-size: 14px; color: grey;">Letzte Antwort:</p>
+                        <p style="margin-top: 3px; margin-bottom: 6px; font-size: 20px;">
+                            <span ng-if="lastAnswerCorrect === true" style="color: #08950f">RICHTIG!</span>
+                            <span ng-if="lastAnswerCorrect === false" style="color: #950808">FALSCH!</span>
+                        </p>
+                    </div>
+                </md-card>
+                <md-card layout="row" layout-align="space-between center" style="height: 210px;">
+                    <div ng-if="showEndScreen" layout="column" style="position: absolute; height: 210px; width: 100%; z-index: 2; background: #414141; color: white; left: 0;">
+                        <p>GAME OVER</p>
+                        <md-button class="md-raised" ng-disabled="emailSentSuccessfully" ng-click="sendMail()">Highscores
+                            per Mail schicken</md-button>
+                        <p ng-if="emailSentSuccessfully">Erfolgreich gesendet!</p>
+                    </div>
+                    <div ng-style="{'background-color' : currentColorCode}" style="height: 180px; width: 120px;"></div>
+                    <div layout="column">
+                        <md-button class="md-raised" ng-click="continueToNextQuestion(currentColorCode, item)"
+                            ng-repeat="item in currentColorNames">{{item}}</md-button>
+                    </div>
+                </md-card>
+                <md-card>
+                    <h3>Highscores</h3>
+                    <canvas id="highscoreChart" width="350" height="220"></canvas>
+                </md-card>
+            </md-content>
+        </div>
+    </div>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/angular.js/1.7.2/angular.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/angular.js/1.7.2/angular-animate.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/angular.js/1.7.2/angular-aria.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/angular-material/1.1.7/angular-material.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/angular-i18n/1.7.3/angular-locale_de-de.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.3.0/Chart.bundle.js"></script>
+
+    <script>
+        var app = angular.module('StarterApp', ['ngMaterial']);
+        app.controller('appController', ['$scope', '$http', '$mdDialog', '$timeout', function ($scope, $http, $mdDialog, $timeout) {
+
+            init = function () {
+                $scope.showStartScreen = true;
+                $scope.continueToNextQuestion();
+                $scope.playerId = create_UUID();
+            }
+
+            $scope.selectColor = function (color) {
+                $scope.playerColor = color;
+            }
+
+            $scope.continueToNextQuestion = function (question, answer) {
+                var data = {};
+                if (question && answer) {
+                    data = {
+                        'colorCode': question,
+                        'colorName': answer,
+                        'playerId': $scope.playerId,
+                        'playerName': $scope.playerName,
+                        'playerColor': $scope.playerColor
+                    }
+                }
+                $scope.questionLoading = true;
+                var req = {
+                    method: 'POST',
+                    url: 'https://wqptx2er60.execute-api.eu-west-1.amazonaws.com/default/QuestionRequestHandler',
+                    headers: {
+                        'content-type': "application/json"
+                    },
+                    data: data
+                }
+                return $http(req)
+                    .then(function (response) {
+                        $scope.currentColorCode = response.data.nextQuestion.colorCode;
+                        $scope.currentColorNames = response.data.nextQuestion.colorNames;
+                        $scope.lastAnswerCorrect = response.data.lastAnswerCorrect;
+                        $scope.highlightedBackgroundColor = response.data.lastAnswerCorrect ? '#92f297' : '#f29292';
+                        $scope.questionLoading = false;
+                        setTimeout(function () {
+                            $scope.highlightedBackgroundColor = '#FFFFFF';
+                            $scope.$apply();
+                        }, 500)
+                    });
+            }
+
+            $scope.showMainPage = function () {
+                $scope.showStartScreen = false;
+                getHighscores();
+                startGameTimer();
+            }
+
+            function startGameTimer() {
+                $scope.gameTimeLeft = 60;
+                reduceGameTimer();
+            }
+
+            function reduceGameTimer() {
+                console.log($scope.gameTimeLeft);
+                $scope.gameTimeLeft--;
+                if ($scope.gameTimeLeft === 0) {
+                    $scope.showEndScreen = true;
+                    this.stopGettingHighscores = true;
+                    return;
+                }
+                setTimeout(function () {
+                    reduceGameTimer();
+                    $scope.$apply();
+                }, 1000);
+            }
+
+            function getHighscores() {
+                var req = {
+                    method: 'GET',
+                    url: 'https://gaj4caicuc.execute-api.eu-west-1.amazonaws.com/default/QuizScoreService'
+                }
+                return $http(req)
+                    .then(function (response) {
+                        $scope.highscores = response.data.players;
+                        updateChart();
+                        if (!this.stopGettingHighscores) {
+                            timeoutPromise = $timeout(getHighscores, 10000);
+                        }
+                    });
+            };
+
+            function updateChart() {
+                if ($scope.chart) {
+                    for (var i = 0; i < 10; i++) {
+                        $scope.chart.data.labels.pop();
+                        $scope.chart.data.datasets[0].data.pop();
+                        $scope.chart.data.datasets[0].backgroundColor.pop();
+                    }
+                    //$scope.chart.update();
+                    for (var i = 0; i < 10; i++) {
+                        $scope.chart.data.labels.push($scope.highscores[i].name);
+                        $scope.chart.data.datasets[0].data.push($scope.highscores[i].score);
+                        $scope.chart.data.datasets[0].backgroundColor.push($scope.highscores[i].color);
+                    }
+                    $scope.chart.update();
+                } else {
+                    Chart.defaults.global.legend.display = false;
+                    var ctx = document.getElementById("highscoreChart");
+                    $scope.chart = new Chart(ctx, {
+                        type: 'horizontalBar',
+                        data: {
+                            labels: getLabelsForChart(),
+                            datasets: [{
+                                label: '',
+                                data: getScoresForChart(),
+                                borderWidth: 1,
+                                backgroundColor: getColorsForChart()
+                            }]
+                        },
+                        options: {
+                            scales: {
+                                xAxes: [{
+                                    display: true,
+                                    ticks: {
+                                        beginAtZero: true,
+                                        min: 0
+                                    }
+                                }]
+                            }
+                        }
+                    });
+                }
+            }
+
+            function getLabelsForChart() {
+                var labels = [];
+                for (var i = 0; i < $scope.highscores.length; i++) {
+                    labels.push($scope.highscores[i].name);
+                }
+                return labels;
+            }
+
+            function getScoresForChart() {
+                var scores = [];
+                for (var i = 0; i < $scope.highscores.length; i++) {
+                    scores.push($scope.highscores[i].score);
+                }
+                return scores;
+            }
+
+            function getColorsForChart() {
+                var scores = [];
+                for (var i = 0; i < $scope.highscores.length; i++) {
+                    scores.push($scope.highscores[i].color);
+                }
+                return scores;
+            }
+
+            $scope.materialColorsDark =
+                ["#F44336", "#E91E63", "#9C27B0", "#673AB7", "#3F51B5", "#2196F3", "#03A9F4", "#00BCD4", "#009688",
+                    "#4CAF50", "#8BC34A", "#CDDC39", "#FFEB3B", "#FFC107", "#FF9800", "#FF5722", "#795548", "#9E9E9E", "#607D8B"];
+
+            function create_UUID() {
+                return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
+                    var r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
+                    return v.toString(16);
+                });
+            }
+
+            $scope.sendMail = function () {
+                var data = {
+                    receiver: 'test@test.com',
+                    highscores: []
+                };
+                for (var i = 0; i < $scope.highscores.length; i++) {
+                    data.highscores.push({
+                        name: $scope.highscores[i].name,
+                        score: $scope.highscores[i].score
+                    });
+                }
+                var req = {
+                    method: 'POST',
+                    url: 'https://ucewrblsaf.execute-api.eu-west-1.amazonaws.com/default/QuizMailService',
+                    headers: {
+                        'content-type': "application/json"
+                    },
+                    data: data
+                }
+                return $http(req)
+                    .then(function (response) {
+                        $scope.emailSentSuccessfully = true;
+                    });
+            };
+
+            init();
+
+        }]);
+
+        app.config(['$mdIconProvider', '$sceDelegateProvider', '$mdThemingProvider', function ($mdIconProvider, $sceDelegateProvider, $mdThemingProvider) {
+
+            $mdIconProvider
+                .iconSet('action', 'https://raw.githubusercontent.com/google/material-design-icons/master/sprites/svg-sprite/svg-sprite-action.svg', 24)
+                .iconSet('communication', 'https://raw.githubusercontent.com/google/material-design-icons/master/sprites/svg-sprite/svg-sprite-communication.svg', 24)
+                .iconSet('content', 'https://raw.githubusercontent.com/google/material-design-icons/master/sprites/svg-sprite/svg-sprite-content.svg', 24)
+                .iconSet('editor', 'https://raw.githubusercontent.com/google/material-design-icons/master/sprites/svg-sprite/svg-sprite-editor.svg', 24)
+                .iconSet('file', 'https://raw.githubusercontent.com/google/material-design-icons/master/sprites/svg-sprite/svg-sprite-file.svg', 24)
+                .iconSet('hardware', 'https://raw.githubusercontent.com/google/material-design-icons/master/sprites/svg-sprite/svg-sprite-hardware.svg', 24)
+                .iconSet('image', 'https://raw.githubusercontent.com/google/material-design-icons/master/sprites/svg-sprite/svg-sprite-image.svg', 24)
+                .iconSet('maps', 'https://raw.githubusercontent.com/google/material-design-icons/master/sprites/svg-sprite/svg-sprite-maps.svg', 24)
+                .iconSet('navigation', 'https://raw.githubusercontent.com/google/material-design-icons/master/sprites/svg-sprite/svg-sprite-navigation.svg', 24)
+                .iconSet('notification', 'https://raw.githubusercontent.com/google/material-design-icons/master/sprites/svg-sprite/svg-sprite-notification.svg', 24)
+                .iconSet('social', 'https://raw.githubusercontent.com/google/material-design-icons/master/sprites/svg-sprite/svg-sprite-social.svg', 24)
+                .defaultIconSet('https://raw.githubusercontent.com/google/material-design-icons/master/sprites/svg-sprite/svg-sprite-action.svg', 24);
+            $mdThemingProvider.theme('altTheme').primaryPalette('blue-grey');
+            $mdThemingProvider.theme('altTheme').accentPalette('grey');
+            $mdThemingProvider.setDefaultTheme('altTheme');
+        }]);
+
+        app.config(['$sceDelegateProvider', function ($sceDelegateProvider) {
+            $sceDelegateProvider.resourceUrlWhitelist(['self', 'https://raw.githubusercontent.com/**']);
+        }])
+
+    </script>
+</body>
+
+</html>
